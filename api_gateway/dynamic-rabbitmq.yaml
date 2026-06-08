@@ -1,0 +1,15 @@
+tcp:
+  routers:
+    rabbitmq:
+      entryPoints:
+        - rabbitmq
+      rule: "HostSNI(`rabbitmq.infocareneapal.com`)"
+      service: rabbitmq-service
+      tls:
+        passthrough: true
+
+  services:
+    rabbitmq-service:
+      loadBalancer:
+        servers:
+          - address: "host.docker.internal:5672"

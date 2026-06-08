@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Step 1 — Installing Docker
+
+# Update your existing list of packages
+sudo apt update
+
+# Install prerequisite packages which let apt use packages over HTTPS
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+
+# Add the GPG key for the official Docker repository to your system
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Add the Docker repository to APT sources
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Update your existing list of packages again for the addition to be recognized
+sudo apt update
+
+# Make sure you are about to install from the Docker repo instead of the default Ubuntu repo
+apt-cache policy docker-ce
+
+# Install Docker
+sudo apt install -y docker-ce
+
+# Check that Docker is running
+sudo systemctl status docker
+
+# Step 2 — Executing the Docker Command Without Sudo (Optional)
+
+# Add your username to the docker group
+sudo usermod -aG docker ${USER}
+
+# Inform the user to log out and log back in
+echo "Please log out and log back in to apply the new group membership, or type 'su - ${USER}'."
+echo "After logging back in, confirm your user is now added to the docker group by typing 'groups'."
+
+
+# Step 3 — Installing Docker Compose
+
+# Create the directory for Docker CLI plugins
+mkdir -p ~/.docker/cli-plugins/
+
+# Download Docker Compose
+curl -SL https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+
+# Set the correct permissions so that the docker compose command is executable
+chmod +x ~/.docker/cli-plugins/docker-compose
+
+# Verify that the installation was successful
+docker compose version
