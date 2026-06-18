@@ -1,29 +1,32 @@
 version: "3.8"
 
 networks:
-  network:
+  global:
     name: production_network
     external: true
 
 services:
 
   portainer:
-    image: portainer/portainer-ce:latest
+    image: ${PORTAINER_IMAGE}
+    container_name: portainer
     ports:
       - 9443:9443
     volumes:
       - data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
+    env_file:
+      - ./.env
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=(Host(`container.infocarenepal.com`))"
-      - "traefik.http.routers.frontend.entrypoints=https"
-      - "traefik.http.services.frontend.loadbalancer.server.port=9000"
-      - "traefik.http.routers.frontend.service=frontend"
-      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portainer.rule=Host(`${PORTAINER_DOMAIN}`)"
+      - "traefik.http.routers.portainer.entrypoints=https"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     networks:
-      - network
+      - global
 
 volumes:
   data:
