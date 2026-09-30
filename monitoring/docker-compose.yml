@@ -4,6 +4,8 @@ services:
     image: grafana/grafana:latest
     environment:
       - GF_SERVER_ROOT_URL=${GRAFANA_ROOT_URL}
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     restart: unless-stopped
 
     volumes:
