@@ -1,0 +1,67 @@
+groups:
+  - name: host
+    rules:
+      - alert: HostHighCPU
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 85% (current value: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: HostHighMemory
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 90% (current value: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: HostLowDiskSpace
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay",mountpoint="/"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay",mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Root filesystem has less than 15% free space (current value: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: HostExporterDown
+        expr: up{job="node-exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node exporter is down"
+          description: "Prometheus cannot scrape node-exporter on {{ $labels.instance }}."
+
+  - name: containers
+    rules:
+      - alert: CadvisorDown
+        expr: up{job="cadvisor"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "cAdvisor is down"
+          description: "Prometheus cannot scrape cAdvisor on {{ $labels.instance }}."
+
+      - alert: ContainerHighCPU
+        expr: sum by (name) (rate(container_cpu_usage_seconds_total{name!=""}[5m])) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU on container {{ $labels.name }}"
+          description: "Container CPU usage is above 80% (current value: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: ContainerHighMemory
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory on container {{ $labels.name }}"
+          description: "Container memory usage is above 90% of its limit (current value: {{ $value | printf \"%.1f\" }}%)."
