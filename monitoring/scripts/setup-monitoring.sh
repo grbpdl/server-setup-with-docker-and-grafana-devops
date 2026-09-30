@@ -24,6 +24,8 @@ required_paths=(
   grafana/provisioning/datasources/datasources.yml
   grafana/provisioning/dashboards/dashboards.yml
   grafana/provisioning/alerting/rules.yml
+  grafana/provisioning/alerting/contactpoints.yml
+  grafana/provisioning/alerting/policies.yml
   grafana/dashboards/host-overview.json
   grafana/dashboards/docker-containers.json
   prometheus/alerts.yml
@@ -78,12 +80,13 @@ echo "  - Prometheus datasource (auto-provisioned)"
 echo "  - Dashboards: Host Overview, Docker Containers"
 echo "  - Grafana alert rules: CPU, memory, disk, exporter down"
 echo "  - Prometheus alert rules: host + container thresholds"
+echo "  - SMTP email contact point (from .env)"
 echo
 echo "Open Grafana at: ${GRAFANA_ROOT_URL}"
 echo "Login with: ${GRAFANA_ADMIN_USER} / (password from .env)"
 echo
 echo "In Grafana:"
 echo "  Dashboards -> Monitoring"
-echo "  Alerting  -> Alert rules"
+echo "  Alerting  -> Alert rules / Contact points"
 echo
 echo "Done."
